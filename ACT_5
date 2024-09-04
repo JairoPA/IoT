@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controlador de LED</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+
+        h1 {
+            margin-bottom: 40px;
+        }
+
+        #Breaker1 {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 300px;
+            height: 12px;
+            background: #ddd;
+            outline: none;
+            opacity: 0.85;
+            transition: opacity 0.2s;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        #Breaker1::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 30px;
+            height: 30px;
+            background: #333;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        #Breaker1::-webkit-slider-thumb:hover {
+            background: #555;
+        }
+
+        #Breaker1:active::-webkit-slider-thumb {
+            background: #999;
+        }
+
+        #state1 {
+            font-size: 1.5em;
+            color: #333;
+            display: block;
+            margin-top: 20px;
+        }
+
+        #icon {
+            width: 100px;
+            height: 100px;
+            margin-top: 20px;
+        }
+    </style>
+    
+    <!-- Cargar la hoja de estilos de Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+    <!-- Cargar la librería Particle API JS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/particle-api-js@8/dist/particle.min.js"></script>
+    
+    <!-- Cargar la librería de Font Awesome (versión 5.15.2) -->
+    <script src="https://use.fontawesome.com/releases/v5.15.2/js/all.js" data-auto-a11y="true"></script>
+    
+    <!-- Cargar jQuery desde Google APIs -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <!-- Cargar la librería D3.js para visualización de datos -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.9.0/d3.min.js"></script>
+    
+    <!-- Cargar la librería Chart.js para gráficos -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
+</head>
+<body>
+    <div>
+        <h1>Control de LED</h1>
+
+        <!-- Control deslizante para encender/apagar el LED -->
+        <input type="range" min="0" max="1" step="1" value="0" id="Breaker1" oninput="outputUpdate(this.value)">
+        
+        <!-- Salida del estado del LED -->
+        <output for="Breaker1" id="state1">Apagado</output>
+
+        <!-- Icono de estado -->
+        <img id="icon" src="https://cdn-icons-png.flaticon.com/512/889/889731.png" alt="Icono de estado">
+    </div>
+
+    <script>
+        // Función para actualizar el estado del LED en la página
+        function outputUpdate(val) {
+            var icon = document.getElementById('icon');
+            var stateOutput = document.getElementById('state1');
+            if (val == 1) {
+                stateOutput.value = "Encendido";
+                icon.src = "https://cdn-icons-png.flaticon.com/512/889/889727.png"; // Ícono para "Encendido"
+            } else {
+                stateOutput.value = "Apagado";
+                icon.src = "https://cdn-icons-png.flaticon.com/512/889/889731.png"; // Ícono para "Apagado"
+            }
+            
+            // Ejemplo de cómo enviar el valor al dispositivo Particle (adaptar según el código backend)
+            var particle = new Particle();
+            particle.login({username: 'jpreciado24@ucol.mx', password: 'JAIROPRE22'}).then(
+                function(data) {
+                    particle.callFunction({ deviceId: '360042001547313036303933', name: 'led', argument: val, auth: data.body.access_token });
+                },
+                function (err) {
+                    console.log('No se pudo autenticar', err);
+                }
+            );
+        }
+    </script>
+</body>
+</html>
